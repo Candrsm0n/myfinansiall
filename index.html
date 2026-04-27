@@ -1,1 +1,956 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Aplikasi Keuangan Pribadi Pro - Premium</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f0f2f8; overflow-x: hidden; }
+        
+        /* LOGIN PAGE - KEREN */
+        .login-page { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; overflow: hidden; }
+        .login-page::before { content: ''; position: absolute; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%; top: -100px; right: -100px; }
+        .login-page::after { content: ''; position: absolute; width: 200px; height: 200px; background: rgba(255,255,255,0.08); border-radius: 50%; bottom: -50px; left: -50px; }
+        
+        .login-card { background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); border-radius: 32px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); width: 480px; max-width: 100%; overflow: hidden; transform: translateY(0); transition: transform 0.3s; animation: fadeInUp 0.5s ease-out; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .login-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 35px; text-align: center; color: white; position: relative; }
+        .login-header i { font-size: 65px; margin-bottom: 15px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2)); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .login-header h4 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .login-header p { font-size: 14px; opacity: 0.9; }
+        
+        .login-body { padding: 35px; }
+        .login-title { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+        .login-subtitle { font-size: 14px; color: #666; margin-bottom: 25px; }
+        
+        /* PERBAIKAN FORM GROUP - ICON TIDAK MENUTUPI TEKS */
+        .form-group { margin-bottom: 22px; position: relative; }
+        .form-label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 8px; margin-left: 4px; }
+        .input-icon { position: relative; width: 100%; }
+        .input-icon i { 
+            position: absolute; 
+            left: 16px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            color: #aaa; 
+            font-size: 18px; 
+            transition: all 0.3s;
+            z-index: 1;
+            pointer-events: none;
+        }
+        /* PENTING: padding kiri yang cukup agar teks tidak tertutup icon */
+        .form-control { 
+            width: 100%; 
+            padding: 14px 18px 14px 50px !important; 
+            border: 2px solid #e9ecef; 
+            border-radius: 16px; 
+            font-size: 15px; 
+            transition: all 0.3s; 
+            background: #f8f9fa;
+            box-sizing: border-box;
+        }
+        /* Khusus untuk semua input type text, password, email */
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="number"] {
+            padding-left: 50px !important;
+        }
+        .form-control:focus { 
+            border-color: #667eea; 
+            outline: none; 
+            background: white; 
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.2); 
+        }
+        .input-icon:focus-within i { color: #667eea; }
+        
+        .form-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px; }
+        .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: #555; }
+        .checkbox-label input { width: 18px; height: 18px; cursor: pointer; accent-color: #667eea; }
+        .forgot-link { color: #667eea; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.3s; }
+        .forgot-link:hover { text-decoration: underline; }
+        
+        .btn-signin { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+        .btn-signin:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102,126,234,0.4); }
+        .btn-signin:active { transform: translateY(0); }
+        
+        .register-link { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e9ecef; }
+        .register-link p { font-size: 14px; color: #666; margin-bottom: 0; }
+        .register-link a { color: #667eea; text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .register-link a:hover { text-decoration: underline; }
+        
+        .alert { padding: 12px 15px; border-radius: 14px; margin-bottom: 20px; font-size: 13px; display: none; align-items: center; gap: 10px; }
+        .alert-danger { background: #fee2e2; color: #dc2626; border-left: 4px solid #dc2626; }
+        .alert-success { background: #dcfce7; color: #16a34a; border-left: 4px solid #16a34a; }
+        .alert-info { background: #dbeafe; color: #2563eb; border-left: 4px solid #2563eb; }
+        
+        /* MODAL FORGOT PASSWORD */
+        .modal-forgot { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-forgot-content { background: white; border-radius: 28px; width: 400px; max-width: 90%; padding: 30px; text-align: center; animation: fadeInUp 0.3s ease; }
+        .modal-forgot-content i { font-size: 60px; color: #667eea; margin-bottom: 15px; }
+        .modal-forgot-content h4 { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+        .modal-forgot-content p { color: #666; margin-bottom: 20px; }
+        .modal-forgot-content .form-control { padding: 14px 18px !important; }
+        .generated-password { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px; border-radius: 16px; font-size: 24px; font-weight: 700; letter-spacing: 2px; margin: 20px 0; font-family: monospace; }
+        .btn-copy { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.3s; margin-right: 10px; }
+        .btn-copy:hover { background: #218838; transform: scale(1.02); }
+        .btn-close-modal { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; }
+        
+        /* SIDEBAR */
+        .sidebar { min-height: 100vh; background: linear-gradient(180deg, #1a2a3a, #0f2027); position: fixed; top: 0; left: 0; width: 280px; color: white; z-index: 1000; transition: transform 0.3s ease-in-out; overflow-y: auto; transform: translateX(-100%); }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header i { font-size: 50px; margin-bottom: 10px; }
+        .sidebar-header h5 { font-size: 20px; font-weight: 600; }
+        .sidebar-menu { padding: 20px 0; }
+        .sidebar-menu button { display: block; width: 100%; padding: 15px 25px; background: none; border: none; color: rgba(255,255,255,0.8); text-align: left; font-size: 15px; cursor: pointer; transition: 0.3s; border-left: 4px solid transparent; }
+        .sidebar-menu button:hover, .sidebar-menu button:active { background: rgba(255,255,255,0.15); color: white; border-left-color: #667eea; padding-left: 35px; }
+        .sidebar-menu button.active { background: rgba(255,255,255,0.2); color: white; border-left-color: #667eea; }
+        .sidebar-menu i { width: 25px; margin-right: 10px; }
+        
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; cursor: pointer; }
+        .sidebar-overlay.active { display: block; }
+        
+        .content { margin-left: 0; padding: 20px; transition: margin-left 0.3s ease-in-out; min-height: 100vh; }
+        .header { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .header h3 { margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
+        .date { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 8px 18px; border-radius: 30px; font-size: 14px; color: #555; font-weight: 500; }
+        
+        .card { background: white; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.05); margin-bottom: 20px; border: none; overflow: hidden; }
+        .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; }
+        .card-body { padding: 20px; }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 8px; }
+        
+        .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 20px; padding: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; transition: all 0.3s ease; }
+        .stat-icon { width: 55px; height: 55px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .stat-icon.primary { background: rgba(102,126,234,0.15); color: #667eea; }
+        .stat-icon.success { background: rgba(40,167,69,0.15); color: #28a745; }
+        .stat-icon.danger { background: rgba(220,53,69,0.15); color: #dc3545; }
+        .stat-icon.info { background: rgba(23,162,184,0.15); color: #17a2b8; }
+        .stat-info h6 { font-size: 11px; color: #888; margin-bottom: 5px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .stat-info h4 { font-size: 20px; font-weight: 800; margin: 0; color: #2c3e50; }
+        
+        .ringkasan-card { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 20px; padding: 20px; color: white; height: 100%; }
+        .ringkasan-item { background: rgba(255,255,255,0.15); border-radius: 14px; padding: 15px; margin-bottom: 12px; }
+        .ringkasan-item h5 { font-size: 24px; font-weight: 800; margin: 5px 0 0 0; }
+        .ringkasan-item p { margin: 0; opacity: 0.9; font-size: 12px; }
+        
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        th { background: #f8f9fa; padding: 12px; text-align: left; font-weight: 700; border-bottom: 2px solid #667eea; }
+        td { padding: 12px; border-bottom: 1px solid #e0e0e0; }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .badge-success { background: #28a745; color: white; }
+        .badge-danger { background: #dc3545; color: white; }
+        
+        .form-control-inline { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 14px; }
+        .form-select { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 14px; }
+        
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; flex-wrap: wrap; }
+        .tab-btn { background: none; border: none; padding: 10px 20px; font-size: 14px; font-weight: 600; color: #7f8c8d; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .tab-btn:hover, .tab-btn:active { color: #667eea; }
+        .tab-btn.active { color: #667eea; border-bottom-color: #667eea; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+        
+        .row { display: flex; flex-wrap: wrap; margin: 0 -10px; }
+        .col-md-6 { width: 100%; padding: 0 10px; margin-bottom: 15px; }
+        .col-md-4 { width: 100%; padding: 0 10px; margin-bottom: 15px; }
+        .col-md-8 { width: 100%; padding: 0 10px; margin-bottom: 15px; }
+        .d-flex { display: flex; }
+        .justify-content-between { justify-content: space-between; }
+        .flex-wrap { flex-wrap: wrap; }
+        .gap-2 { gap: 10px; }
+        .text-success { color: #28a745 !important; }
+        .text-danger { color: #dc3545 !important; }
+        .text-center { text-align: center; }
+        .text-end { text-align: right; }
+        .fw-bold { font-weight: 700; }
+        .mb-0 { margin-bottom: 0; }
+        .mb-2 { margin-bottom: 10px; }
+        .mb-3 { margin-bottom: 15px; }
+        .mb-4 { margin-bottom: 20px; }
+        .mt-2 { margin-top: 10px; }
+        .mt-3 { margin-top: 15px; }
+        .w-100 { width: 100%; }
+        .chart-container { position: relative; height: 250px; width: 100%; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-content { background: white; border-radius: 20px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; margin: auto; }
+        .modal-header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px 20px; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 20px; }
+        .modal-footer { padding: 15px 20px; border-top: 1px solid #e0e0e0; display: flex; justify-content: flex-end; gap: 10px; }
+        .close-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        
+        .category-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #e0e0e0; }
+        .category-badge { width: 20px; height: 20px; border-radius: 6px; margin-right: 10px; display: inline-block; }
+        
+        .report-summary-card { background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 16px; padding: 15px; text-align: center; margin-bottom: 15px; }
+        .amount-income { font-size: 24px; font-weight: 800; color: #28a745; }
+        .amount-expense { font-size: 24px; font-weight: 800; color: #dc3545; }
+        .amount-balance { font-size: 24px; font-weight: 800; color: #667eea; }
+        
+        .progress { height: 20px; background: #f0f0f0; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #28a745, #20c997); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+        
+        .menu-toggle { position: fixed; bottom: 20px; right: 20px; z-index: 1001; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 50%; width: 55px; height: 55px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
+        .menu-toggle:active { transform: scale(0.95); }
+        
+        .export-preview { background: #1e1e2f; border-radius: 12px; padding: 15px; margin-top: 15px; overflow-x: auto; }
+        .csv-preview-table { width: 100%; font-size: 11px; border-collapse: collapse; }
+        .csv-preview-table th { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 8px; text-align: center; }
+        .csv-preview-table td { padding: 6px 8px; border-bottom: 1px solid #334; color: #ddd; text-align: center; }
+        
+        /* RESPONSIF */
+        @media (min-width: 768px) {
+            .content { margin-left: 280px; padding: 30px; }
+            .col-md-6 { width: 50%; margin-bottom: 0; }
+            .col-md-4 { width: 33.33%; margin-bottom: 0; }
+            .col-md-8 { width: 66.67%; margin-bottom: 0; }
+            .stat-card { padding: 22px; }
+            .stat-icon { width: 65px; height: 65px; font-size: 28px; }
+            .stat-info h4 { font-size: 26px; }
+            .menu-toggle { display: none; }
+            .sidebar { transform: translateX(0) !important; }
+        }
+        
+        @media (max-width: 767px) {
+            .stat-row { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .stat-card { padding: 12px; }
+            .stat-icon { width: 45px; height: 45px; font-size: 20px; }
+            .stat-info h4 { font-size: 16px; }
+            .ringkasan-item h5 { font-size: 20px; }
+            .btn { padding: 8px 16px; font-size: 13px; }
+            th, td { padding: 10px 8px; font-size: 12px; }
+            .login-body { padding: 25px; }
+            /* PERBAIKAN RESPONSIF UNTUK HP */
+            .form-control { padding: 12px 15px 12px 45px !important; font-size: 14px; }
+            input[type="text"], input[type="password"], input[type="email"] { padding-left: 45px !important; }
+            .input-icon i { font-size: 16px; left: 14px; }
+        }
+        
+        @media (max-width: 480px) {
+            .stat-row { grid-template-columns: 1fr; }
+            .content { padding: 15px; }
+            .header { padding: 15px; }
+            .card-body { padding: 15px; }
+            .login-body { padding: 20px; }
+            .form-control { padding: 11px 12px 11px 42px !important; }
+            input[type="text"], input[type="password"], input[type="email"] { padding-left: 42px !important; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="login-page">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-wallet"></i>
+                <h4>KEUANGAN PRO</h4>
+                <p>Kelola Keuangan Pribadi dengan Mudah</p>
+            </div>
+            <div class="login-body">
+                <div id="loginFormDiv">
+                    <div class="login-title">Welcome Back!</div>
+                    <div class="login-subtitle">Masuk untuk melanjutkan</div>
+                    <div id="loginError" class="alert alert-danger"></div>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label class="form-label">Username / Email</label>
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="text" id="username" class="form-control" placeholder="admin atau email@example.com">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="password" class="form-control" placeholder="Masukkan password">
+                            </div>
+                        </div>
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="rememberMe">
+                                <span>Remember me</span>
+                            </label>
+                            <a class="forgot-link" onclick="showForgotPasswordModal()">Lupa Password?</a>
+                        </div>
+                        <button type="submit" class="btn-signin"><i class="fas fa-arrow-right-to-bracket me-2"></i>Sign In</button>
+                    </form>
+                    <div class="register-link">
+                        <p>Don't have an account? <a onclick="showRegisterForm()">Register</a></p>
+                    </div>
+                </div>
+                <div id="registerFormDiv" style="display: none;">
+                    <div class="login-title">Create Account</div>
+                    <div class="login-subtitle">Daftar untuk memulai</div>
+                    <div id="registerError" class="alert alert-danger"></div>
+                    <div id="registerSuccess" class="alert alert-success"></div>
+                    <form>
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="regUsername" class="form-control" placeholder="Buat username">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="regEmail" class="form-control" placeholder="email@example.com">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="regPassword" class="form-control" placeholder="Buat password">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirm Password</label>
+                            <div class="input-icon">
+                                <i class="fas fa-check-circle"></i>
+                                <input type="password" id="regConfirmPassword" class="form-control" placeholder="Konfirmasi password">
+                            </div>
+                        </div>
+                        <button type="button" onclick="registerUser()" class="btn-signin"><i class="fas fa-user-plus me-2"></i>Register</button>
+                    </form>
+                    <div class="register-link"><p>Already have an account? <a onclick="showLoginForm()">Sign In</a></p></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- MODAL LUPA PASSWORD -->
+    <div class="modal-forgot" id="forgotPasswordModal">
+        <div class="modal-forgot-content">
+            <i class="fas fa-key"></i>
+            <h4>Lupa Password?</h4>
+            <p>Masukkan username atau email Anda, kami akan membuatkan password baru acak untuk Anda.</p>
+            <input type="text" id="forgotUsername" class="form-control" placeholder="Username atau Email" style="margin-bottom: 15px; padding-left: 18px !important;">
+            <button onclick="generateRandomPassword()" class="btn-signin" style="background: linear-gradient(135deg, #28a745, #20c997);"><i class="fas fa-sync-alt me-2"></i>Reset Password</button>
+            <div id="generatedPasswordResult" style="display: none; margin-top: 20px;">
+                <p style="color: #666;">Password baru Anda:</p>
+                <div class="generated-password" id="newRandomPassword">********</div>
+                <button onclick="copyNewPassword()" class="btn-copy"><i class="fas fa-copy me-2"></i>Salin Password</button>
+                <button onclick="closeForgotPasswordModal()" class="btn-close-modal"><i class="fas fa-times me-2"></i>Tutup</button>
+            </div>
+            <button onclick="closeForgotPasswordModal()" class="btn-close-modal" style="margin-top: 15px; background: #6c757d;"><i class="fas fa-arrow-left me-2"></i>Kembali</button>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="appPage" style="display: none;">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-chart-line"></i>
+                <h5>KeuanganKu Pro</h5>
+                <p id="userDisplay">User</p>
+            </div>
+            <div class="sidebar-menu">
+                <button onclick="showPage('dashboard')" id="menuDashboard" class="active"><i class="fas fa-home"></i> Dashboard</button>
+                <button onclick="showPage('transaksi')" id="menuTransaksi"><i class="fas fa-exchange-alt"></i> Transaksi</button>
+                <button onclick="showPage('kategori')" id="menuKategori"><i class="fas fa-tags"></i> Kategori</button>
+                <button onclick="showPage('tabungan')" id="menuTabungan"><i class="fas fa-piggy-bank"></i> Tabungan</button>
+                <button onclick="showPage('hutang')" id="menuHutang"><i class="fas fa-hand-holding-usd"></i> Hutang/Piutang</button>
+                <button onclick="showPage('laporan')" id="menuLaporan"><i class="fas fa-file-alt"></i> Laporan</button>
+                <button onclick="showPage('tambah')" id="menuTambah"><i class="fas fa-plus-circle"></i> Tambah Data</button>
+                <button onclick="showEditProfileModal()"><i class="fas fa-user-cog"></i> Ubah Profil</button>
+                <hr>
+                <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <div class="content" id="mainContent">
+            <div class="header">
+                <h3 id="pageTitle">Dashboard</h3>
+                <div class="date" id="currentDate"></div>
+            </div>
+            <div id="messageArea" class="alert" style="display: none;"></div>
+
+            <!-- DASHBOARD -->
+            <div id="dashboardPage">
+                <div class="d-flex justify-content-between mb-3 flex-wrap gap-2">
+                    <h4 style="font-weight: 700;">Ringkasan Keuangan</h4>
+                    <button onclick="showPage('tambah')" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Tambah Data</button>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-card"><div class="stat-icon primary"><i class="fas fa-wallet"></i></div><div class="stat-info"><h6>Total Saldo</h6><h4 id="totalBalance">Rp 0</h4></div></div>
+                    <div class="stat-card"><div class="stat-icon success"><i class="fas fa-arrow-up"></i></div><div class="stat-info"><h6>Pemasukan Bulan Ini</h6><h4 id="monthlyIncome">Rp 0</h4></div></div>
+                    <div class="stat-card"><div class="stat-icon danger"><i class="fas fa-arrow-down"></i></div><div class="stat-info"><h6>Pengeluaran Bulan Ini</h6><h4 id="monthlyExpense">Rp 0</h4></div></div>
+                    <div class="stat-card"><div class="stat-icon info"><i class="fas fa-chart-line"></i></div><div class="stat-info"><h6>Total Transaksi</h6><h4 id="totalTransactions">0</h4></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card"><div class="card-header"><h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Grafik 7 Hari Terakhir</h5></div><div class="card-body"><div class="chart-container"><canvas id="chartDashboard"></canvas></div></div></div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="ringkasan-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3"><i class="fas fa-chart-pie fa-2x"></i><span style="background:rgba(255,255,255,0.2);padding:5px 12px;border-radius:20px;font-size:11px;">Info Terkini</span></div>
+                            <div class="ringkasan-item"><p><i class="fas fa-tags me-2"></i> TOTAL KATEGORI</p><h5 id="totalCategories">0</h5></div>
+                            <div class="ringkasan-item"><p><i class="fas fa-piggy-bank me-2"></i> TOTAL TABUNGAN</p><h5 id="totalSavings">0</h5></div>
+                            <div class="ringkasan-item"><p><i class="fas fa-hand-holding-usd me-2"></i> HUTANG AKTIF</p><h5 id="activeDebts">0</h5></div>
+                            <div class="ringkasan-item"><p><i class="fas fa-coins me-2"></i> TOTAL ASET TABUNGAN</p><h5 id="totalSavingsAmount">Rp 0</h5></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card"><div class="card-header"><h5 class="mb-0"><i class="fas fa-history me-2"></i>Transaksi Terbaru</h5></div><div class="card-body"><div class="table-responsive"><table class="table"><thead><tr><th>Tanggal</th><th>Kategori</th><th>Deskripsi</th><th>Jumlah</th><th>Tipe</th></tr></thead><tbody id="recentTransactions"></tbody></table></div></div></div>
+            </div>
+
+            <!-- TRANSAKSI -->
+            <div id="transaksiPage" style="display: none;">
+                <div class="d-flex justify-content-between mb-3 flex-wrap gap-2"><h4>Semua Transaksi</h4><div class="d-flex gap-2"><button onclick="showPage('tambah')" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Tambah</button><button onclick="showExportModal()" class="btn btn-success"><i class="fas fa-download me-1"></i>Export</button></div></div>
+                <div class="card"><div class="card-body"><div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Tanggal</th><th>Kategori</th><th>Deskripsi</th><th>Jumlah</th><th>Tipe</th><th>Aksi</th></tr></thead><tbody id="allTransactions"></tbody></table></div></div></div>
+            </div>
+
+            <!-- KATEGORI -->
+            <div id="kategoriPage" style="display: none;">
+                <div class="d-flex justify-content-between mb-3"><h4>Manajemen Kategori</h4><button onclick="showPage('tambah')" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Tambah Kategori</button></div>
+                <div class="row"><div class="col-md-6"><div class="card"><div class="card-header bg-success text-white"><h5 class="mb-0"><i class="fas fa-arrow-up me-2"></i>Pemasukan</h5></div><div class="card-body"><div id="incomeCategoriesList"></div></div></div></div>
+                <div class="col-md-6"><div class="card"><div class="card-header bg-danger text-white"><h5 class="mb-0"><i class="fas fa-arrow-down me-2"></i>Pengeluaran</h5></div><div class="card-body"><div id="expenseCategoriesList"></div></div></div></div></div>
+            </div>
+
+            <!-- TABUNGAN -->
+            <div id="tabunganPage" style="display: none;">
+                <div class="d-flex justify-content-between mb-3"><h4>Tabungan Saya</h4><button onclick="showPage('tambah')" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Tambah Tabungan</button></div>
+                <div class="row" id="savingsList"></div>
+            </div>
+
+            <!-- HUTANG -->
+            <div id="hutangPage" style="display: none;">
+                <div class="d-flex justify-content-between mb-3"><h4>Hutang & Piutang</h4><button onclick="showPage('tambah')" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Tambah Data</button></div>
+                <div class="row"><div class="col-md-6"><div class="card"><div class="card-header bg-danger text-white"><h5 class="mb-0">Hutang</h5></div><div class="card-body" id="debtsList"></div></div></div>
+                <div class="col-md-6"><div class="card"><div class="card-header bg-success text-white"><h5 class="mb-0">Piutang</h5></div><div class="card-body" id="receivablesList"></div></div></div></div>
+            </div>
+
+            <!-- LAPORAN -->
+            <div id="laporanPage" style="display: none;">
+                <h4 class="mb-3">Laporan Keuangan</h4>
+                <div class="card mb-3"><div class="card-body"><div class="row g-2">
+                    <div class="col-6 col-md-3"><label class="form-label">Bulan</label><select id="reportMonth" class="form-select"><option value="1">Januari</option><option value="2">Februari</option><option value="3" selected>Maret</option><option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option><option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option><option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option></select></div>
+                    <div class="col-6 col-md-3"><label class="form-label">Tahun</label><select id="reportYear" class="form-select"><option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option><option value="2028">2028</option></select></div>
+                    <div class="col-6 col-md-3"><button onclick="generateReport()" class="btn btn-primary w-100 mt-4"><i class="fas fa-chart-line me-1"></i>Tampilkan</button></div>
+                    <div class="col-6 col-md-3"><button onclick="exportMonthlyReport()" class="btn btn-success w-100 mt-4"><i class="fas fa-file-excel me-1"></i>Export</button></div>
+                </div></div></div>
+                <div class="row mb-3"><div class="col-4"><div class="report-summary-card"><i class="fas fa-arrow-up fa-2x text-success mb-1"></i><h6 class="text-muted">Pemasukan</h6><h3 class="amount-income" id="reportIncome">Rp 0</h3></div></div>
+                <div class="col-4"><div class="report-summary-card"><i class="fas fa-arrow-down fa-2x text-danger mb-1"></i><h6 class="text-muted">Pengeluaran</h6><h3 class="amount-expense" id="reportExpense">Rp 0</h3></div></div>
+                <div class="col-4"><div class="report-summary-card"><i class="fas fa-wallet fa-2x text-primary mb-1"></i><h6 class="text-muted">Saldo</h6><h3 class="amount-balance" id="reportBalance">Rp 0</h3></div></div></div>
+                <div class="card mb-3"><div class="card-header"><h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Grafik Perbandingan</h5></div><div class="card-body"><div class="chart-container"><canvas id="monthlyComparisonChart"></canvas></div></div></div>
+                <div class="card"><div class="card-header"><h5 class="mb-0"><i class="fas fa-list me-2"></i>Detail Transaksi</h5></div><div class="card-body"><div class="table-responsive"><table class="table"><thead><tr><th>Tanggal</th><th>Kategori</th><th>Deskripsi</th><th class="text-end">Jumlah</th><th class="text-center">Tipe</th><tr></thead><tbody id="reportTransactions"></tbody></table></div></div></div>
+            </div>
+
+            <!-- TAMBAH DATA -->
+            <div id="tambahPage" style="display: none;">
+                <h4 class="mb-3">Tambah Data</h4>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab('tabTransaksi')"><i class="fas fa-exchange-alt me-2"></i>Transaksi</button>
+                    <button class="tab-btn" onclick="openTab('tabKategori')"><i class="fas fa-tags me-2"></i>Kategori</button>
+                    <button class="tab-btn" onclick="openTab('tabTabungan')"><i class="fas fa-piggy-bank me-2"></i>Tabungan</button>
+                    <button class="tab-btn" onclick="openTab('tabHutang')"><i class="fas fa-hand-holding-usd me-2"></i>Hutang/Piutang</button>
+                </div>
+                <div id="tabTransaksi" class="tab-pane active"><div class="card"><div class="card-header"><h5 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>Tambah Transaksi</h5></div><div class="card-body">
+                    <div class="form-group"><label class="form-label">Tipe</label><select id="transactionTipe" class="form-select" onchange="updateTransactionKategori()"><option value="Pemasukan">Pemasukan</option><option value="Pengeluaran">Pengeluaran</option></select></div>
+                    <div class="form-group"><label class="form-label">Kategori</label><select id="transactionKategori" class="form-select"></select></div>
+                    <div class="form-group"><label class="form-label">Jumlah (Rp)</label><input type="number" id="transactionJumlah" class="form-control" placeholder="Masukkan jumlah"></div>
+                    <div class="form-group"><label class="form-label">Deskripsi</label><input type="text" id="transactionDeskripsi" class="form-control" placeholder="Deskripsi"></div>
+                    <div class="form-group"><label class="form-label">Tanggal</label><input type="date" id="transactionTanggal" class="form-control"></div>
+                    <button onclick="saveTransaction()" class="btn btn-primary w-100"><i class="fas fa-save me-2"></i>Simpan</button>
+                </div></div></div>
+                <div id="tabKategori" class="tab-pane"><div class="card"><div class="card-header"><h5 class="mb-0"><i class="fas fa-tags me-2"></i>Tambah Kategori</h5></div><div class="card-body">
+                    <div class="form-group"><label class="form-label">Nama Kategori</label><input type="text" id="categoryName" class="form-control" placeholder="Contoh: Makanan"></div>
+                    <div class="form-group"><label class="form-label">Tipe</label><select id="categoryType" class="form-select"><option value="Pemasukan">Pemasukan</option><option value="Pengeluaran">Pengeluaran</option></select></div>
+                    <div class="form-group"><label class="form-label">Warna</label><input type="color" id="categoryColor" class="form-control" value="#3498db"></div>
+                    <div class="form-group"><label class="form-label">Icon</label><select id="categoryIcon" class="form-select"><option value="fas fa-money-bill-wave">💰 Uang</option><option value="fas fa-utensils">🍽️ Makanan</option><option value="fas fa-bus">🚗 Transport</option><option value="fas fa-shopping-cart">🛒 Belanja</option><option value="fas fa-film">🎬 Hiburan</option><option value="fas fa-file-invoice">📄 Tagihan</option></select></div>
+                    <button onclick="saveCategory()" class="btn btn-primary w-100"><i class="fas fa-save me-2"></i>Simpan</button>
+                </div></div></div>
+                <div id="tabTabungan" class="tab-pane"><div class="card"><div class="card-header"><h5 class="mb-0"><i class="fas fa-piggy-bank me-2"></i>Tambah Tabungan</h5></div><div class="card-body">
+                    <div class="form-group"><label class="form-label">Nama Tabungan</label><input type="text" id="savingName" class="form-control" placeholder="Contoh: Liburan"></div>
+                    <div class="form-group"><label class="form-label">Target (Rp)</label><input type="number" id="savingTarget" class="form-control" placeholder="Target"></div>
+                    <div class="form-group"><label class="form-label">Saldo Awal (Rp)</label><input type="number" id="savingCurrent" class="form-control" value="0"></div>
+                    <div class="form-group"><label class="form-label">Deadline</label><input type="date" id="savingDeadline" class="form-control"></div>
+                    <button onclick="saveSaving()" class="btn btn-primary w-100"><i class="fas fa-save me-2"></i>Simpan</button>
+                </div></div></div>
+                <div id="tabHutang" class="tab-pane"><div class="card"><div class="card-header"><h5 class="mb-0"><i class="fas fa-hand-holding-usd me-2"></i>Tambah Hutang/Piutang</h5></div><div class="card-body">
+                    <div class="form-group"><label class="form-label">Tipe</label><select id="debtTipe" class="form-select"><option value="Hutang">Hutang</option><option value="Piutang">Piutang</option></select></div>
+                    <div class="form-group"><label class="form-label">Nama Pihak</label><input type="text" id="debtNama" class="form-control" placeholder="Nama orang/lembaga"></div>
+                    <div class="form-group"><label class="form-label">Jumlah (Rp)</label><input type="number" id="debtJumlah" class="form-control" placeholder="Jumlah"></div>
+                    <div class="form-group"><label class="form-label">Deskripsi</label><input type="text" id="debtDeskripsi" class="form-control" placeholder="Keterangan"></div>
+                    <div class="form-group"><label class="form-label">Tanggal</label><input type="date" id="debtTanggal" class="form-control"></div>
+                    <div class="form-group"><label class="form-label">Jatuh Tempo</label><input type="date" id="debtJatuhTempo" class="form-control"></div>
+                    <button onclick="saveDebt()" class="btn btn-primary w-100"><i class="fas fa-save me-2"></i>Simpan</button>
+                </div></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="editProfileModal"><div class="modal-content"><div class="modal-header"><h5>Ubah Profil</h5><button class="close-btn" onclick="closeEditProfileModal()">&times;</button></div><div class="modal-body"><div id="profileError" class="alert alert-danger" style="display:none"></div><div id="profileSuccess" class="alert alert-success" style="display:none"></div><div class="form-group"><label>Username Baru</label><input type="text" id="newUsername" class="form-control"></div><div class="form-group"><label>Password Lama</label><input type="password" id="oldPassword" class="form-control"></div><div class="form-group"><label>Password Baru</label><input type="password" id="newPassword" class="form-control"></div><div class="form-group"><label>Konfirmasi Password Baru</label><input type="password" id="confirmNewPassword" class="form-control"></div></div><div class="modal-footer"><button onclick="closeEditProfileModal()" class="btn btn-secondary">Batal</button><button onclick="updateProfile()" class="btn btn-primary">Simpan</button></div></div></div>
+    <div class="modal" id="exportModal"><div class="modal-content"><div class="modal-header"><h5>Export Data</h5><button class="close-btn" onclick="closeExportModal()">&times;</button></div><div class="modal-body"><p>Pilih format export:</p><div class="d-flex gap-2 mb-3"><button onclick="exportData('json')" class="btn btn-primary">JSON</button><button onclick="exportData('csv')" class="btn btn-success">CSV</button></div><div class="export-preview"><table class="csv-preview-table"><thead><tr><th>Tanggal</th><th>Tipe</th><th>Kategori</th><th>Deskripsi</th><th>Jumlah</th></tr></thead><tbody id="csvPreviewBody"><tr><td colspan="5" style="text-align:center">Loading...</td></tr></tbody></table></div></div><div class="modal-footer"><button onclick="closeExportModal()" class="btn btn-secondary">Tutup</button></div></div></div>
+    <div class="modal" id="editCategoryModal"><div class="modal-content"><div class="modal-header"><h5>Edit Kategori</h5><button class="close-btn" onclick="closeEditCategoryModal()">&times;</button></div><div class="modal-body"><input type="hidden" id="editCategoryId"><div class="form-group"><label>Nama</label><input type="text" id="editCategoryName" class="form-control"></div><div class="form-group"><label>Tipe</label><select id="editCategoryType" class="form-select"><option value="Pemasukan">Pemasukan</option><option value="Pengeluaran">Pengeluaran</option></select></div><div class="form-group"><label>Warna</label><input type="color" id="editCategoryColor" class="form-control"></div><div class="form-group"><label>Icon</label><select id="editCategoryIcon" class="form-select"><option value="fas fa-money-bill-wave">💰 Uang</option><option value="fas fa-utensils">🍽️ Makanan</option><option value="fas fa-bus">🚗 Transport</option><option value="fas fa-shopping-cart">🛒 Belanja</option><option value="fas fa-film">🎬 Hiburan</option><option value="fas fa-file-invoice">📄 Tagihan</option></select></div></div><div class="modal-footer"><button onclick="closeEditCategoryModal()" class="btn btn-secondary">Batal</button><button onclick="updateCategory()" class="btn btn-primary">Update</button></div></div></div>
+    <div class="modal" id="addSavingModal"><div class="modal-content"><div class="modal-header"><h5>Tambah Saldo</h5><button class="close-btn" onclick="closeAddSavingModal()">&times;</button></div><div class="modal-body"><input type="hidden" id="addSavingId"><p><strong id="addSavingName"></strong></p><div class="form-group"><label>Jumlah</label><input type="number" id="addSavingAmount" class="form-control"></div></div><div class="modal-footer"><button onclick="closeAddSavingModal()" class="btn btn-secondary">Batal</button><button onclick="processAddSaving()" class="btn btn-success">Tambah</button></div></div></div>
+
+    <script>
+        // ========== DATA ==========
+        let users = [];
+        try {
+            let stored = localStorage.getItem('users');
+            if (stored) users = JSON.parse(stored);
+            if (!users.find(u => u.username === 'admin')) {
+                users.unshift({ username: 'admin', password: 'admin123', email: 'admin@keuangan.com' });
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+        } catch(e) { users = [{ username: 'admin', password: 'admin123' }]; localStorage.setItem('users', JSON.stringify(users)); }
+        
+        let currentUser = null;
+        let transactions = [];
+        let categories = [
+            { id: 1, nama: 'Gaji', tipe: 'Pemasukan', warna: '#28a745', icon: 'fas fa-money-bill-wave' },
+            { id: 2, nama: 'Bonus', tipe: 'Pemasukan', warna: '#17a2b8', icon: 'fas fa-gift' },
+            { id: 3, nama: 'Makanan', tipe: 'Pengeluaran', warna: '#dc3545', icon: 'fas fa-utensils' },
+            { id: 4, nama: 'Transport', tipe: 'Pengeluaran', warna: '#fd7e14', icon: 'fas fa-bus' },
+            { id: 5, nama: 'Belanja', tipe: 'Pengeluaran', warna: '#6f42c1', icon: 'fas fa-shopping-cart' },
+            { id: 6, nama: 'Tagihan', tipe: 'Pengeluaran', warna: '#20c997', icon: 'fas fa-file-invoice' },
+            { id: 7, nama: 'Hiburan', tipe: 'Pengeluaran', warna: '#e83e8c', icon: 'fas fa-film' }
+        ];
+        let savings = [];
+        let debts = [];
+        let chart, monthlyChart;
+        
+        // ========== HELPER ==========
+        function rupiah(angka) { return 'Rp ' + (angka || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+        function formatTanggal(tanggal) { if(!tanggal) return '-'; let d=new Date(tanggal); return d.getDate()+' '+['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][d.getMonth()]+' '+d.getFullYear(); }
+        function formatTanggalCSV(tanggal) { if(!tanggal) return '-'; let d=new Date(tanggal); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+        
+        function toggleSidebar() {
+            let sidebar = document.getElementById('sidebar');
+            let overlay = document.getElementById('sidebarOverlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            } else {
+                sidebar.classList.add('open');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        function showMessage(text, type) { let msg = document.getElementById('messageArea'); msg.className = 'alert alert-' + type; msg.innerHTML = '<i class="fas fa-'+(type==='success'?'check-circle':'exclamation-circle')+' me-2"></i>'+text; msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 3000); }
+        
+        function loadUserData(username) {
+            try {
+                transactions = JSON.parse(localStorage.getItem(`transactions_${username}`)) || [];
+                let savedCats = localStorage.getItem(`categories_${username}`);
+                if (savedCats) categories = JSON.parse(savedCats);
+                savings = JSON.parse(localStorage.getItem(`savings_${username}`)) || [];
+                debts = JSON.parse(localStorage.getItem(`debts_${username}`)) || [];
+            } catch(e) {}
+        }
+        
+        function saveUserData(username) {
+            localStorage.setItem(`transactions_${username}`, JSON.stringify(transactions));
+            localStorage.setItem(`categories_${username}`, JSON.stringify(categories));
+            localStorage.setItem(`savings_${username}`, JSON.stringify(savings));
+            localStorage.setItem(`debts_${username}`, JSON.stringify(debts));
+        }
+        
+        // ========== LOGIN FUNCTIONS ==========
+        function saveRememberMe(username, password) { try { localStorage.setItem('rememberedUser', JSON.stringify({ username, password, timestamp: Date.now() })); } catch(e) {} }
+        function clearRememberMe() { try { localStorage.removeItem('rememberedUser'); } catch(e) {} }
+        function getRememberedUser() { try { let r = localStorage.getItem('rememberedUser'); return r ? JSON.parse(r) : null; } catch(e) { return null; } }
+        
+        let generatedPassword = '';
+        
+        function showForgotPasswordModal() {
+            document.getElementById('forgotUsername').value = '';
+            document.getElementById('generatedPasswordResult').style.display = 'none';
+            document.getElementById('forgotPasswordModal').style.display = 'flex';
+        }
+        
+        function closeForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').style.display = 'none';
+        }
+        
+        function generateRandomPassword() {
+            const input = document.getElementById('forgotUsername').value.trim();
+            if (!input) {
+                alert('Masukkan username atau email Anda!');
+                return;
+            }
+            
+            let user = users.find(u => u.username === input || u.email === input);
+            
+            if (!user) {
+                alert('Username atau email tidak ditemukan!');
+                return;
+            }
+            
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+            let newPassword = '';
+            for (let i = 0; i < 8; i++) {
+                newPassword += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            generatedPassword = newPassword;
+            
+            user.password = newPassword;
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            document.getElementById('newRandomPassword').innerHTML = newPassword;
+            document.getElementById('generatedPasswordResult').style.display = 'block';
+        }
+        
+        function copyNewPassword() {
+            if (generatedPassword) {
+                navigator.clipboard.writeText(generatedPassword);
+                alert('Password berhasil disalin!');
+            }
+        }
+        
+        function showLoginForm() {
+            document.getElementById('loginFormDiv').style.display = 'block';
+            document.getElementById('registerFormDiv').style.display = 'none';
+            document.getElementById('loginError').style.display = 'none';
+        }
+        
+        function showRegisterForm() {
+            document.getElementById('loginFormDiv').style.display = 'none';
+            document.getElementById('registerFormDiv').style.display = 'block';
+            document.getElementById('registerError').style.display = 'none';
+            document.getElementById('registerSuccess').style.display = 'none';
+        }
+        
+        function registerUser() {
+            let username = document.getElementById('regUsername').value.trim();
+            let email = document.getElementById('regEmail').value.trim();
+            let password = document.getElementById('regPassword').value;
+            let confirm = document.getElementById('regConfirmPassword').value;
+            if (!username || !email || !password) { document.getElementById('registerError').innerHTML = 'Semua field harus diisi!'; document.getElementById('registerError').style.display = 'block'; return; }
+            if (password !== confirm) { document.getElementById('registerError').innerHTML = 'Password tidak cocok!'; document.getElementById('registerError').style.display = 'block'; return; }
+            if (users.find(u => u.username === username)) { document.getElementById('registerError').innerHTML = 'Username sudah terdaftar!'; document.getElementById('registerError').style.display = 'block'; return; }
+            users.push({ username, password, email });
+            localStorage.setItem('users', JSON.stringify(users));
+            document.getElementById('registerError').style.display = 'none';
+            document.getElementById('registerSuccess').innerHTML = 'Registrasi berhasil! Silakan login.';
+            document.getElementById('registerSuccess').style.display = 'block';
+            setTimeout(() => showLoginForm(), 1500);
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let username = document.getElementById('username').value.trim();
+            let password = document.getElementById('password').value;
+            let remember = document.getElementById('rememberMe').checked;
+            if (!username || !password) { document.getElementById('loginError').innerHTML = 'Username dan password harus diisi!'; document.getElementById('loginError').style.display = 'block'; return; }
+            users = JSON.parse(localStorage.getItem('users')) || [];
+            if (!users.find(u => u.username === 'admin')) users.unshift({ username: 'admin', password: 'admin123' });
+            let user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                if (remember) saveRememberMe(username, password); else clearRememberMe();
+                currentUser = username;
+                loadUserData(username);
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('appPage').style.display = 'block';
+                document.getElementById('userDisplay').innerHTML = username;
+                document.getElementById('currentDate').innerHTML = new Date().toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+                refreshAllData();
+                showPage('dashboard');
+            } else {
+                document.getElementById('loginError').innerHTML = 'Username atau password salah!<br><small>Default: admin / admin123</small>';
+                document.getElementById('loginError').style.display = 'block';
+            }
+        });
+        
+        function logout() {
+            if (currentUser) saveUserData(currentUser);
+            currentUser = null;
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('appPage').style.display = 'none';
+            showLoginForm();
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('rememberMe').checked = false;
+            if(window.innerWidth <= 768) closeSidebar();
+        }
+        
+        function checkRememberedUser() {
+            let remembered = getRememberedUser();
+            if (remembered) {
+                document.getElementById('username').value = remembered.username;
+                document.getElementById('password').value = remembered.password;
+                document.getElementById('rememberMe').checked = true;
+                setTimeout(() => { document.getElementById('loginForm').dispatchEvent(new Event('submit')); }, 200);
+            }
+        }
+        
+        // ========== APP FUNCTIONS ==========
+        function showPage(page) {
+            document.getElementById('dashboardPage').style.display = 'none';
+            document.getElementById('transaksiPage').style.display = 'none';
+            document.getElementById('kategoriPage').style.display = 'none';
+            document.getElementById('tabunganPage').style.display = 'none';
+            document.getElementById('hutangPage').style.display = 'none';
+            document.getElementById('laporanPage').style.display = 'none';
+            document.getElementById('tambahPage').style.display = 'none';
+            document.getElementById(page+'Page').style.display = 'block';
+            document.getElementById('pageTitle').innerHTML = page.charAt(0).toUpperCase() + page.slice(1);
+            document.querySelectorAll('.sidebar-menu button').forEach(btn => btn.classList.remove('active'));
+            let menuBtn = document.getElementById('menu' + page.charAt(0).toUpperCase() + page.slice(1));
+            if(menuBtn) menuBtn.classList.add('active');
+            if(window.innerWidth <= 768) closeSidebar();
+            if(page === 'dashboard') { updateDashboard(); setTimeout(() => updateChart(), 100); }
+            if(page === 'transaksi') { displayAllTransactions(); updateCSVPreview(); }
+            if(page === 'kategori') displayCategories();
+            if(page === 'tabungan') displaySavings();
+            if(page === 'hutang') displayDebts();
+            if(page === 'laporan') { generateReport(); updateMonthlyComparisonChart(); }
+            if(page === 'tambah') { updateTransactionKategori(); }
+        }
+        
+        function refreshAllData() { updateDashboard(); displayAllTransactions(); displayCategories(); displaySavings(); displayDebts(); setTimeout(() => updateChart(), 100); if(currentUser) saveUserData(currentUser); }
+        
+        // DASHBOARD
+        function updateDashboard() {
+            let totalMasuk = transactions.filter(t=>t.tipe==='Pemasukan').reduce((s,t)=>s+(t.jumlah||0),0);
+            let totalKeluar = transactions.filter(t=>t.tipe==='Pengeluaran').reduce((s,t)=>s+(t.jumlah||0),0);
+            let now = new Date(), bulanIni = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+            let masukBulan = transactions.filter(t=>t.tanggal?.startsWith(bulanIni) && t.tipe==='Pemasukan').reduce((s,t)=>s+(t.jumlah||0),0);
+            let keluarBulan = transactions.filter(t=>t.tanggal?.startsWith(bulanIni) && t.tipe==='Pengeluaran').reduce((s,t)=>s+(t.jumlah||0),0);
+            document.getElementById('totalBalance').innerHTML = rupiah(totalMasuk - totalKeluar);
+            document.getElementById('monthlyIncome').innerHTML = rupiah(masukBulan);
+            document.getElementById('monthlyExpense').innerHTML = rupiah(keluarBulan);
+            document.getElementById('totalTransactions').innerHTML = transactions.length;
+            document.getElementById('totalCategories').innerHTML = categories.length;
+            document.getElementById('totalSavings').innerHTML = savings.length;
+            document.getElementById('activeDebts').innerHTML = debts.filter(d=>d.status !== 'Lunas').length;
+            document.getElementById('totalSavingsAmount').innerHTML = rupiah(savings.reduce((s,sv)=>s+(sv.current||0),0));
+            let recent = [...transactions].reverse().slice(0,5);
+            document.getElementById('recentTransactions').innerHTML = recent.map(t => `<tr>
+                <td>${formatTanggal(t.tanggal)}</td>
+                <td>${t.kategori||'-'}</td>
+                <td>${t.deskripsi||'-'}</td>
+                <td class="${t.tipe==='Pemasukan'?'text-success':'text-danger'} fw-bold">${rupiah(t.jumlah)}</td>
+                <td><span class="badge ${t.tipe==='Pemasukan'?'badge-success':'badge-danger'}">${t.tipe}</span></td>
+                </tr>`).join('') || '<tr><td colspan="5" class="text-center">Belum ada transaksi</td></tr>';
+        }
+        
+        function updateChart() {
+            let ctx = document.getElementById('chartDashboard')?.getContext('2d'); if(!ctx) return;
+            if(chart) chart.destroy();
+            let labels=[], pMasuk=[], pKeluar=[];
+            for(let i=6;i>=0;i--){ let d=new Date(); d.setDate(d.getDate()-i); let ds=d.toISOString().split('T')[0]; labels.push(d.getDate()+'/'+(d.getMonth()+1));
+                let dayTrans=transactions.filter(t=>t.tanggal===ds);
+                pMasuk.push(dayTrans.filter(t=>t.tipe==='Pemasukan').reduce((s,t)=>s+(t.jumlah||0),0));
+                pKeluar.push(dayTrans.filter(t=>t.tipe==='Pengeluaran').reduce((s,t)=>s+(t.jumlah||0),0));
+            }
+            chart = new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Pemasukan',data:pMasuk,borderColor:'#28a745',backgroundColor:'rgba(40,167,69,0.1)',fill:true,tension:0.3},{label:'Pengeluaran',data:pKeluar,borderColor:'#dc3545',backgroundColor:'rgba(220,53,69,0.1)',fill:true,tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{ticks:{callback:v=>'Rp '+v.toLocaleString('id-ID')}}}}});
+        }
+        
+        function updateMonthlyComparisonChart() {
+            let ctx = document.getElementById('monthlyComparisonChart')?.getContext('2d'); if(!ctx) return;
+            if(monthlyChart) monthlyChart.destroy();
+            let months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+            let tahun = document.getElementById('reportYear').value;
+            let pMasuk=[], pKeluar=[];
+            for(let m=1;m<=12;m++){ let bulanStr=`${tahun}-${String(m).padStart(2,'0')}`;
+                pMasuk.push(transactions.filter(t=>t.tanggal?.startsWith(bulanStr) && t.tipe==='Pemasukan').reduce((s,t)=>s+(t.jumlah||0),0));
+                pKeluar.push(transactions.filter(t=>t.tanggal?.startsWith(bulanStr) && t.tipe==='Pengeluaran').reduce((s,t)=>s+(t.jumlah||0),0));
+            }
+            monthlyChart = new Chart(ctx,{type:'bar',data:{labels:months,datasets:[{label:'Pemasukan',data:pMasuk,backgroundColor:'#28a745'},{label:'Pengeluaran',data:pKeluar,backgroundColor:'#dc3545'}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{ticks:{callback:v=>'Rp '+v.toLocaleString('id-ID')}}}}});
+        }
+        
+        // TRANSAKSI
+        function displayAllTransactions() {
+            let html = '';
+            [...transactions].reverse().forEach((t,i)=>{
+                let cat = categories.find(c=>c.nama===t.kategori)||{warna:'#6c757d'};
+                html += `<tr>
+                    <td>${formatTanggal(t.tanggal)}</td>
+                    <td><span style="display:inline-block;width:12px;height:12px;border-radius:4px;background:${cat.warna};margin-right:5px;"></span>${t.kategori}</td>
+                    <td>${t.deskripsi||'-'}</td>
+                    <td class="${t.tipe==='Pemasukan'?'text-success':'text-danger'} fw-bold">${rupiah(t.jumlah)}</td>
+                    <td><span class="badge ${t.tipe==='Pemasukan'?'badge-success':'badge-danger'}">${t.tipe}</span></td>
+                    <td><button onclick="deleteTransaction(${i})" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Hapus</button></td>
+                </tr>`;
+            });
+            document.getElementById('allTransactions').innerHTML = html || '<tr><td colspan="6" class="text-center">Belum ada transaksi</td></tr>';
+        }
+        
+        function deleteTransaction(i) { if(confirm('Hapus transaksi?')){ transactions.splice(i,1); refreshAllData(); showMessage('Transaksi dihapus','success'); } }
+        
+        function saveTransaction(){
+            let tipe=document.getElementById('transactionTipe').value, kategori=document.getElementById('transactionKategori').value, jumlah=parseInt(document.getElementById('transactionJumlah').value), deskripsi=document.getElementById('transactionDeskripsi').value, tanggal=document.getElementById('transactionTanggal').value || new Date().toISOString().split('T')[0];
+            if(!jumlah || jumlah<=0) return showMessage('Jumlah harus positif','danger');
+            transactions.push({id:Date.now(), tanggal, tipe, kategori, jumlah, deskripsi});
+            refreshAllData();
+            showMessage('Transaksi ditambahkan','success');
+            document.getElementById('transactionJumlah').value='';
+            document.getElementById('transactionDeskripsi').value='';
+        }
+        
+        function updateTransactionKategori(){
+            let tipe=document.getElementById('transactionTipe').value;
+            document.getElementById('transactionKategori').innerHTML = categories.filter(c=>c.tipe===tipe).map(c=>`<option value="${c.nama}">${c.nama}</option>`).join('');
+        }
+        
+        // KATEGORI
+        function displayCategories(){
+            document.getElementById('incomeCategoriesList').innerHTML = categories.filter(c=>c.tipe==='Pemasukan').map(c=>`<div class="category-item"><div><span class="category-badge" style="background:${c.warna}"></span><i class="${c.icon} me-1"></i><strong>${c.nama}</strong></div><div><button onclick="editCategory(${c.id})" class="btn btn-warning btn-sm me-1"><i class="fas fa-edit"></i></button><button onclick="deleteCategory(${c.id})" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button></div></div>`).join('') || '<p class="text-muted text-center">Belum ada kategori</p>';
+            document.getElementById('expenseCategoriesList').innerHTML = categories.filter(c=>c.tipe==='Pengeluaran').map(c=>`<div class="category-item"><div><span class="category-badge" style="background:${c.warna}"></span><i class="${c.icon} me-1"></i><strong>${c.nama}</strong></div><div><button onclick="editCategory(${c.id})" class="btn btn-warning btn-sm me-1"><i class="fas fa-edit"></i></button><button onclick="deleteCategory(${c.id})" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button></div></div>`).join('') || '<p class="text-muted text-center">Belum ada kategori</p>';
+        }
+        
+        function saveCategory(){ let nama=document.getElementById('categoryName').value.trim(), tipe=document.getElementById('categoryType').value, warna=document.getElementById('categoryColor').value, icon=document.getElementById('categoryIcon').value; if(!nama) return showMessage('Nama kategori harus diisi','danger'); categories.push({id:Date.now(), nama, tipe, warna, icon}); refreshAllData(); showMessage('Kategori ditambahkan','success'); document.getElementById('categoryName').value=''; }
+        
+        function editCategory(id){ let c=categories.find(c=>c.id===id); if(c){ document.getElementById('editCategoryId').value=c.id; document.getElementById('editCategoryName').value=c.nama; document.getElementById('editCategoryType').value=c.tipe; document.getElementById('editCategoryColor').value=c.warna; document.getElementById('editCategoryIcon').value=c.icon; document.getElementById('editCategoryModal').style.display='flex'; } }
+        function closeEditCategoryModal(){ document.getElementById('editCategoryModal').style.display='none'; }
+        function updateCategory(){ let id=parseInt(document.getElementById('editCategoryId').value), idx=categories.findIndex(c=>c.id===id); if(idx!==-1){ categories[idx]={id, nama:document.getElementById('editCategoryName').value, tipe:document.getElementById('editCategoryType').value, warna:document.getElementById('editCategoryColor').value, icon:document.getElementById('editCategoryIcon').value}; refreshAllData(); closeEditCategoryModal(); showMessage('Kategori diupdate','success'); } }
+        function deleteCategory(id){ if(confirm('Hapus kategori?')){ categories=categories.filter(c=>c.id!==id); refreshAllData(); showMessage('Kategori dihapus','success'); } }
+        
+        // TABUNGAN
+        function displaySavings(){
+            if(savings.length===0){ document.getElementById('savingsList').innerHTML='<div class="col-12"><div class="card p-4 text-center"><i class="fas fa-piggy-bank fa-3x text-muted mb-2"></i><h5>Belum ada tabungan</h5><button onclick="showPage(\'tambah\')" class="btn btn-primary mt-2">Tambah Tabungan</button></div></div>'; return; }
+            let html='';
+            savings.forEach(s=>{ let persen=s.target?Math.min(100,Math.round((s.current/s.target)*100)):0; html+=`<div class="col-md-6 mb-3"><div class="card"><div class="card-body"><div class="d-flex justify-content-between"><h5>${s.nama}</h5><div><button onclick='openAddSavingModal(${s.id},"${s.nama}")' class="btn btn-success btn-sm me-1"><i class="fas fa-plus"></i></button><button onclick="deleteSaving(${s.id})" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button></div></div><div class="progress mb-2"><div class="progress-bar" style="width:${persen}%">${persen}%</div></div><div class="d-flex justify-content-between"><span>Terkumpul: ${rupiah(s.current)}</span><span>Target: ${rupiah(s.target)}</span></div>${s.deadline?`<p class="text-muted small mt-2"><i class="far fa-calendar-alt"></i> Deadline: ${formatTanggal(s.deadline)}</p>`:''}</div></div></div>`; });
+            document.getElementById('savingsList').innerHTML = html;
+        }
+        
+        function saveSaving(){ let nama=document.getElementById('savingName').value.trim(), target=parseInt(document.getElementById('savingTarget').value), current=parseInt(document.getElementById('savingCurrent').value)||0, deadline=document.getElementById('savingDeadline').value; if(!nama||!target) return showMessage('Nama dan target harus diisi','danger'); savings.push({id:Date.now(), nama, target, current, deadline:deadline||null}); refreshAllData(); showMessage('Tabungan ditambahkan','success'); document.getElementById('savingName').value=''; document.getElementById('savingTarget').value=''; document.getElementById('savingCurrent').value='0'; document.getElementById('savingDeadline').value=''; }
+        function openAddSavingModal(id,nama){ document.getElementById('addSavingId').value=id; document.getElementById('addSavingName').innerHTML=nama; document.getElementById('addSavingAmount').value=''; document.getElementById('addSavingModal').style.display='flex'; }
+        function closeAddSavingModal(){ document.getElementById('addSavingModal').style.display='none'; }
+        function processAddSaving(){ let id=parseInt(document.getElementById('addSavingId').value), amount=parseInt(document.getElementById('addSavingAmount').value); if(!amount||amount<=0) return showMessage('Jumlah valid diperlukan','danger'); let idx=savings.findIndex(s=>s.id===id); if(idx!==-1){ savings[idx].current=(savings[idx].current||0)+amount; refreshAllData(); closeAddSavingModal(); showMessage('Saldo ditambahkan','success'); } }
+        function deleteSaving(id){ if(confirm('Hapus tabungan?')){ savings=savings.filter(s=>s.id!==id); refreshAllData(); showMessage('Tabungan dihapus','success'); } }
+        
+        // HUTANG
+        function displayDebts(){
+            let hutang='', piutang='';
+            debts.forEach((d,i)=>{ if(d.status!=='Lunas'){ if(d.tipe==='Hutang'){ hutang+=`<div class="border-bottom mb-2 pb-2"><div class="d-flex justify-content-between"><div><strong>${d.nama}</strong><br><small>${d.deskripsi||'-'}</small></div><div class="text-end"><span class="text-danger fw-bold">${rupiah(d.jumlah)}</span><br><button onclick="lunasHutang(${i})" class="btn btn-success btn-sm mt-1">Lunas</button></div></div></div>`; } else { piutang+=`<div class="border-bottom mb-2 pb-2"><div class="d-flex justify-content-between"><div><strong>${d.nama}</strong><br><small>${d.deskripsi||'-'}</small></div><div class="text-end"><span class="text-success fw-bold">${rupiah(d.jumlah)}</span><br><button onclick="lunasHutang(${i})" class="btn btn-success btn-sm mt-1">Diterima</button></div></div></div>`; } } });
+            document.getElementById('debtsList').innerHTML = hutang || '<p class="text-muted text-center">Tidak ada hutang</p>';
+            document.getElementById('receivablesList').innerHTML = piutang || '<p class="text-muted text-center">Tidak ada piutang</p>';
+        }
+        
+        function lunasHutang(i){ debts[i].status='Lunas'; refreshAllData(); showMessage('Status diperbarui','success'); }
+        function saveDebt(){ let tipe=document.getElementById('debtTipe').value, nama=document.getElementById('debtNama').value.trim(), jumlah=parseInt(document.getElementById('debtJumlah').value), deskripsi=document.getElementById('debtDeskripsi').value, tanggal=document.getElementById('debtTanggal').value||new Date().toISOString().split('T')[0], jatuhTempo=document.getElementById('debtJatuhTempo').value; if(!nama||!jumlah) return showMessage('Nama dan jumlah harus diisi','danger'); debts.push({id:Date.now(), tipe, nama, jumlah, deskripsi, tanggal, jatuhTempo, status:'Belum Lunas'}); refreshAllData(); showMessage('Data ditambahkan','success'); document.getElementById('debtNama').value=''; document.getElementById('debtJumlah').value=''; document.getElementById('debtDeskripsi').value=''; document.getElementById('debtJatuhTempo').value=''; }
+        
+        // LAPORAN
+        function generateReport(){
+            let bulan=document.getElementById('reportMonth').value.padStart(2,'0'), tahun=document.getElementById('reportYear').value, bulanStr=`${tahun}-${bulan}`;
+            let filtered=transactions.filter(t=>t.tanggal?.startsWith(bulanStr));
+            let totalMasuk=filtered.filter(t=>t.tipe==='Pemasukan').reduce((s,t)=>s+(t.jumlah||0),0);
+            let totalKeluar=filtered.filter(t=>t.tipe==='Pengeluaran').reduce((s,t)=>s+(t.jumlah||0),0);
+            document.getElementById('reportIncome').innerHTML=rupiah(totalMasuk);
+            document.getElementById('reportExpense').innerHTML=rupiah(totalKeluar);
+            document.getElementById('reportBalance').innerHTML=rupiah(totalMasuk-totalKeluar);
+            document.getElementById('reportTransactions').innerHTML=filtered.map(t=>`<tr><td>${formatTanggal(t.tanggal)}</td><td>${t.kategori}</td><td>${t.deskripsi||'-'}</td><td class="text-end fw-bold ${t.tipe==='Pemasukan'?'text-success':'text-danger'}">${rupiah(t.jumlah)}</td><td class="text-center"><span class="badge ${t.tipe==='Pemasukan'?'badge-success':'badge-danger'}">${t.tipe}</span></td></tr>`).join('')||'<tr><td colspan="5" class="text-center">Tidak ada transaksi</td></tr>';
+            updateMonthlyComparisonChart();
+        }
+        function exportMonthlyReport(){
+            let bulan=document.getElementById('reportMonth').value.padStart(2,'0'), tahun=document.getElementById('reportYear').value;
+            let data=transactions.filter(t=>t.tanggal?.startsWith(`${tahun}-${bulan}`));
+            let csv="Tanggal,Tipe,Kategori,Deskripsi,Jumlah\n"+data.map(t=>`"${t.tanggal}","${t.tipe}","${t.kategori}","${(t.deskripsi||'').replace(/"/g,'""')}","${t.jumlah}"`).join("\n");
+            let blob=new Blob(["\uFEFF"+csv],{type:'text/csv'});
+            let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`laporan_${tahun}_${bulan}.csv`; a.click(); URL.revokeObjectURL(a.href);
+            showMessage('Laporan diekspor','success');
+        }
+        
+        // EXPORT
+        function showExportModal(){ updateCSVPreview(); document.getElementById('exportModal').style.display='flex'; }
+        function closeExportModal(){ document.getElementById('exportModal').style.display='none'; }
+        function updateCSVPreview(){
+            let tbody=document.getElementById('csvPreviewBody');
+            if(!tbody) return;
+            let preview=[...transactions].reverse().slice(0,10);
+            if(preview.length===0){ tbody.innerHTML='<tr><td colspan="5" style="text-align:center">Belum ada transaksi</td></tr>'; return; }
+            tbody.innerHTML=preview.map(t=>`<tr><td>${formatTanggal(t.tanggal)}</td><td><span class="badge ${t.tipe==='Pemasukan'?'badge-success':'badge-danger'}">${t.tipe}</span></td><td>${t.kategori}</td><td>${t.deskripsi||'-'}</td><td>${rupiah(t.jumlah)}</td></tr>`).join('');
+        }
+        function exportData(format){
+            let data=transactions;
+            let filename=`transaksi_${Date.now()}`;
+            if(format==='json'){ let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${filename}.json`; a.click(); URL.revokeObjectURL(a.href); showMessage('JSON diekspor','success'); }
+            else if(format==='csv'){ let headers="Tanggal,Tipe,Kategori,Deskripsi,Jumlah"; let rows=data.map(t=>`"${t.tanggal}","${t.tipe}","${t.kategori}","${(t.deskripsi||'').replace(/"/g,'""')}","${t.jumlah}"`).join("\n"); let blob=new Blob(["\uFEFF"+headers+"\n"+rows],{type:'text/csv'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${filename}.csv`; a.click(); URL.revokeObjectURL(a.href); showMessage('CSV diekspor','success'); }
+            closeExportModal();
+        }
+        
+        // EDIT PROFIL
+        function showEditProfileModal(){ document.getElementById('newUsername').value=currentUser; document.getElementById('oldPassword').value=''; document.getElementById('newPassword').value=''; document.getElementById('confirmNewPassword').value=''; document.getElementById('profileError').style.display='none'; document.getElementById('profileSuccess').style.display='none'; document.getElementById('editProfileModal').style.display='flex'; }
+        function closeEditProfileModal(){ document.getElementById('editProfileModal').style.display='none'; }
+        function updateProfile(){
+            let newUsername=document.getElementById('newUsername').value.trim(), oldPassword=document.getElementById('oldPassword').value, newPassword=document.getElementById('newPassword').value, confirm=document.getElementById('confirmNewPassword').value;
+            let idx=users.findIndex(u=>u.username===currentUser);
+            if(idx===-1){ showMessage('User tidak ditemukan','danger'); return; }
+            if(users[idx].password!==oldPassword){ document.getElementById('profileError').innerHTML='Password lama salah!'; document.getElementById('profileError').style.display='block'; return; }
+            if(newUsername!==currentUser && users.find(u=>u.username===newUsername)){ document.getElementById('profileError').innerHTML='Username sudah digunakan!'; document.getElementById('profileError').style.display='block'; return; }
+            if(newPassword && newPassword!==confirm){ document.getElementById('profileError').innerHTML='Password baru tidak cocok!'; document.getElementById('profileError').style.display='block'; return; }
+            saveUserData(currentUser);
+            if(newUsername!==currentUser){
+                localStorage.setItem(`transactions_${newUsername}`,JSON.stringify(transactions));
+                localStorage.setItem(`categories_${newUsername}`,JSON.stringify(categories));
+                localStorage.setItem(`savings_${newUsername}`,JSON.stringify(savings));
+                localStorage.setItem(`debts_${newUsername}`,JSON.stringify(debts));
+                localStorage.removeItem(`transactions_${currentUser}`);
+                localStorage.removeItem(`categories_${currentUser}`);
+                localStorage.removeItem(`savings_${currentUser}`);
+                localStorage.removeItem(`debts_${currentUser}`);
+            }
+            users[idx]={username:newUsername, password:newPassword||oldPassword};
+            localStorage.setItem('users',JSON.stringify(users));
+            if(getRememberedUser() && getRememberedUser().username===currentUser) saveRememberMe(newUsername,newPassword||oldPassword);
+            currentUser=newUsername;
+            document.getElementById('userDisplay').innerHTML=currentUser;
+            document.getElementById('profileSuccess').innerHTML='Profil diupdate! Silakan login ulang.';
+            document.getElementById('profileSuccess').style.display='block';
+            setTimeout(()=>{ closeEditProfileModal(); logout(); },2000);
+        }
+        
+        function openTab(tabId){
+            document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.closest('.tab-btn').classList.add('active');
+        }
+        
+        // INIT
+        document.getElementById('transactionTanggal').value = new Date().toISOString().split('T')[0];
+        document.getElementById('debtTanggal').value = new Date().toISOString().split('T')[0];
+        document.getElementById('menuToggle').addEventListener('click', toggleSidebar);
+        document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
+        window.addEventListener('resize', function() { if(window.innerWidth > 768) closeSidebar(); });
+        
+        window.onclick = function(event) {
+            let modal = document.getElementById('forgotPasswordModal');
+            if (event.target === modal) closeForgotPasswordModal();
+        }
+        
+        checkRememberedUser();
+        
+        console.log('%c✅ APLIKASI KEUANGAN PRO - SIAP DIGUNAKAN', 'color: #28a745; font-size: 16px; font-weight: bold');
+        console.log('%c🔐 Login: admin | Password: admin123', 'color: #ff9800; font-size: 14px');
+        console.log('%c🔑 Fitur Lupa Password: Klik "Lupa Password?" untuk reset password otomatis acak', 'color: #2196F3; font-size: 12px');
+    </script>
+</body>
+                              </html>
